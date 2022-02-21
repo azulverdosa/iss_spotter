@@ -28,4 +28,30 @@ const fetchMyIP = (callback) => {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = (ip, callback) => {
+  return request(`https://api.freegeoip.app/json/${ip}?apikey=b8cf5200-934a-11ec-9a19-1311bf3af799`,
+    (error, response, body) => {
+      if (error) {
+        return callback(error, null);
+      }
+
+      if (response.statusCode === 200) {
+        const ipDetails = JSON.parse(body); // {latitude, longitude, .. }
+        const latitude = ipDetails.latitude;
+        const longitude = ipDetails.longitude;
+
+        return callback(null, {
+          latitude,
+          longitude
+        })
+      }
+
+      return callback(Error(`Status Code ${response.statusCode} when fetching Coordinates for IP: ${body}`), null);
+    }
+  );
+}
+
+module.exports = { 
+  fetchMyIP,
+  fetchCoordsByIP
+ };
